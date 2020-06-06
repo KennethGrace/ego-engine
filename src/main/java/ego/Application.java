@@ -1,6 +1,8 @@
-import engine.Engine;
-import engine.GameLogic;
-import sample.Dummy;
+package ego;
+
+import ego.engine.Engine;
+import ego.engine.GameLogic;
+import ego.sample.Dummy;
 
 public class Application {
     public static void main(String[] args) {

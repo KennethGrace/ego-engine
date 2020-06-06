@@ -1,2 +1,4 @@
 # Project exclude paths
-/target/
+target/*
+ego_engine.iml
+.idea/*

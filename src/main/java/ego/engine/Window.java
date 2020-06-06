@@ -1,4 +1,4 @@
-package engine;
+package ego.engine;
 
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;

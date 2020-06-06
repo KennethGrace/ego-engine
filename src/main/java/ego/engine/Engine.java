@@ -1,4 +1,4 @@
-package engine;
+package ego.engine;
 
 public class Engine implements Runnable {
 
@@ -24,13 +24,15 @@ public class Engine implements Runnable {
             gameLoop();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            cleanup();
         }
     }
 
     public void init() throws Exception{
         window.init();
         timer.init();
-        logic.init();
+        logic.init(window);
     }
 
     public void gameLoop() {
@@ -56,6 +58,10 @@ public class Engine implements Runnable {
                 sync();
             }
         }
+    }
+
+    protected void cleanup(){
+        logic.cleanup();
     }
 
     private void sync() {
