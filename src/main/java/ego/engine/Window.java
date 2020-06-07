@@ -4,10 +4,9 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
-import static org.lwjgl.opengl.GL11.GL_FALSE;
-import static org.lwjgl.opengl.GL11.GL_TRUE;
-import static org.lwjgl.opengl.GL11.glClearColor;
 import org.lwjgl.system.MemoryUtil;
+
+import static org.lwjgl.opengl.GL11.*;
 
 public class Window {
 
@@ -85,6 +84,11 @@ public class Window {
 
         // Set the clear color
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glEnable(GL_DEPTH_TEST);
+    }
+
+    public long getWindowHandle() {
+        return windowHandle;
     }
 
     public void update() {

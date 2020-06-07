@@ -23,6 +23,7 @@
     <properties>
         <lwjgl.version>3.2.3</lwjgl.version>
         <joml.version>1.9.24</joml.version>
+        <pngdecoder.version>1.0</pngdecoder.version>
         <lwjgl.natives>natives-windows</lwjgl.natives>
     </properties>
 
@@ -355,6 +356,11 @@
             <groupId>org.joml</groupId>
             <artifactId>joml</artifactId>
             <version>${joml.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.l33tlabs.twl</groupId>
+            <artifactId>pngdecoder</artifactId>
+            <version>${pngdecoder.version}</version>
         </dependency>
     </dependencies>
 
