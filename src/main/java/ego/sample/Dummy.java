@@ -4,6 +4,7 @@ import ego.engine.*;
 import ego.engine.graph.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import static org.lwjgl.glfw.GLFW.*;
 
@@ -27,16 +28,16 @@ public class Dummy implements GameLogic {
     public void init(Window window) throws Exception {
         renderer.init(window);
         float reflectance = 1f;
-        //Mesh mesh = OBJLoader.loadMesh("/models/bunny.obj");
-        //Material material = new Material(new Vector3f(0.2f, 0.5f, 0.5f), reflectance);
+        Mesh mesh = OBJLoader.loadMesh("/models/Nefertiti.obj");
+        Material material = new Material(new Vector4f(0.5f, 0.5f, 0.5f, 1.0f), reflectance);
 
-        Mesh mesh = OBJLoader.loadMesh("/models/cube.obj");
-        Texture texture = new Texture("textures/grassblock.png");
-        Material material = new Material(texture, reflectance);
+        //Mesh mesh = OBJLoader.loadMesh("/models/cube.obj");
+        //Texture texture = new Texture("textures/Nefertiti.png");
+        //Material material = new Material(texture, reflectance);
 
         mesh.setMaterial(material);
         GameItem gameItem = new GameItem(mesh);
-        gameItem.setScale(0.5f);
+        gameItem.setScale(0.05f);
         gameItem.setPosition(0, 0, -2);
         gameItems = new GameItem[]{gameItem};
 
