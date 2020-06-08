@@ -1,9 +1,9 @@
 package ego.engine;
 
-import ego.engine.graph.Camera;
-import ego.engine.graph.ShaderProgram;
-import ego.engine.graph.Transformation;
+import ego.engine.graph.*;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.glBufferData;
@@ -20,22 +20,29 @@ public class Renderer {
     private static final float Z_FAR = 1000.f;
     private final Transformation transformation;
     private ShaderProgram shaderProgram;
+    private float specularPower;
 
     public Renderer() {
         transformation = new Transformation();
+        specularPower = 10f;
     }
 
     public void init(Window window) throws Exception {
         //Create Shader
         shaderProgram = new ShaderProgram();
-        shaderProgram.createVertexShader(Utils.loadResource("/vertex.glsl"));
-        shaderProgram.createFragmentShader(Utils.loadResource("/fragment.glsl"));
+        shaderProgram.createVertexShader(Utils.loadResource("/shaders/vertex.glsl"));
+        shaderProgram.createFragmentShader(Utils.loadResource("/shaders/fragment.glsl"));
         shaderProgram.link();
-        //Create Projection Matrix
-        float aspectRatio = (float) window.getWidth() / window.getHeight();
+        // Create uniforms for modelView and projection matrices and texture
         shaderProgram.createUniform("projectionMatrix");
         shaderProgram.createUniform("modelViewMatrix");
         shaderProgram.createUniform("texture_sampler");
+        // Create uniform for material
+        shaderProgram.createMaterialUniform("material");
+        // Create lighting related uniforms
+        shaderProgram.createUniform("specularPower");
+        shaderProgram.createUniform("ambientLight");
+        shaderProgram.createPointLightUniform("pointLight");
         window.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
@@ -43,24 +50,44 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, Camera camera, GameItem[] gameItems) {
+    public void render(Window window, Camera camera, GameItem[] gameItems, Vector3f ambientLight, PointLight pointLight) {
         clear();
         if(window.isResized()){
             glViewport(0,0,window.getWidth(),window.getHeight());
             window.setResized(false);
         }
         shaderProgram.bind();
+
+        //update the projection matrix
         Matrix4f projectionMatrix = transformation.getProjectionMatrix(FOV, window.getWidth(), window.getHeight(), Z_NEAR, Z_FAR);
         shaderProgram.setUniform("projectionMatrix", projectionMatrix);
+
+        // update the view matrix
         Matrix4f viewMatrix = transformation.getViewMatrix(camera);
+        // update the light Uniforms
+        shaderProgram.setUniform("ambientLight", ambientLight);
+        shaderProgram.setUniform("specularPower", specularPower);
+        // Get a copy of the light object and transform its position to view coordinates
+        PointLight currPointLight = new PointLight(pointLight);
+        Vector3f lightPos = currPointLight.getPosition();
+        Vector4f aux = new Vector4f(lightPos, 1);
+        aux.mul(viewMatrix);
+        lightPos.x = aux.x;
+        lightPos.y = aux.y;
+        lightPos.z = aux.z;
+        shaderProgram.setUniform("pointLight", currPointLight);
+
         shaderProgram.setUniform("texture_sampler", 0);
         // Render each gameItem
         for(GameItem gameItem : gameItems) {
+            Mesh mesh = gameItem.getMesh();
             // Set world matrix for this item
             Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
             shaderProgram.setUniform("modelViewMatrix", modelViewMatrix);
-            // Render the mes for this game item
-            gameItem.getMesh().render();
+            // Set the material uniform for this game item
+            shaderProgram.setUniform("material", mesh.getMaterial());
+            // Render the Mesh
+            mesh.render();
         }
         shaderProgram.unbind();
     }
