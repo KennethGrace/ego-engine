@@ -5,6 +5,8 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
+import java.util.List;
+
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL15.glBufferData;
 import static org.lwjgl.opengl.GL15.glDeleteBuffers;
@@ -43,6 +45,8 @@ public class Renderer {
         shaderProgram.createUniform("specularPower");
         shaderProgram.createUniform("ambientLight");
         shaderProgram.createPointLightUniform("pointLight");
+        shaderProgram.createSpotLightUniform("spotLight");
+        shaderProgram.createDirectionalLightUniform("directionalLight");
         window.setClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     }
 
@@ -50,7 +54,8 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    public void render(Window window, Camera camera, GameItem[] gameItems, Vector3f ambientLight, PointLight pointLight) {
+    public void render(Window window, Camera camera, List<GameItem> gameItems, Vector3f ambientLight, PointLight pointLight,
+                       SpotLight spotLight, DirectionalLight directionalLight) {
         clear();
         if(window.isResized()){
             glViewport(0,0,window.getWidth(),window.getHeight());
@@ -76,10 +81,29 @@ public class Renderer {
         lightPos.y = aux.y;
         lightPos.z = aux.z;
         shaderProgram.setUniform("pointLight", currPointLight);
+        // Get a copy of the spot light object and transform its position and cone direction to view coordinates
+        SpotLight currSpotLight = new SpotLight(spotLight);
+        Vector4f dir = new Vector4f(currSpotLight.getConeDirection(), 0);
+        dir.mul(viewMatrix);
+        currSpotLight.setConeDirection(new Vector3f(dir.x, dir.y, dir.z));
+        Vector3f spotLightPos = currSpotLight.getPointLight().getPosition();
+        Vector4f auxSpot = new Vector4f(spotLightPos, 1);
+        auxSpot.mul(viewMatrix);
+        spotLightPos.x = auxSpot.x;
+        spotLightPos.y = auxSpot.y;
+        spotLightPos.z = auxSpot.z;
+        shaderProgram.setUniform("spotLight", currSpotLight);
+        // Get a copy of the directional light object and transform its position to view coordinates
+        DirectionalLight currDirLight = new DirectionalLight(directionalLight);
+        dir = new Vector4f(currDirLight.getDirection(), 0);
+        dir.mul(viewMatrix);
+        currDirLight.setDirection(new Vector3f(dir.x, dir.y, dir.z));
+        shaderProgram.setUniform("directionalLight", currDirLight);
 
         shaderProgram.setUniform("texture_sampler", 0);
         // Render each gameItem
         for(GameItem gameItem : gameItems) {
+            System.out.println("Currently Printing GameItem: " + gameItem.getId() + " at (" + gameItem.getPosition().x + ", " + gameItem.getPosition().z + ")");
             Mesh mesh = gameItem.getMesh();
             // Set world matrix for this item
             Matrix4f modelViewMatrix = transformation.getModelViewMatrix(gameItem, viewMatrix);
