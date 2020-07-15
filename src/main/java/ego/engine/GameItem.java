@@ -4,16 +4,24 @@ import ego.engine.graph.Mesh;
 import org.joml.Vector3f;
 
 public class GameItem {
+    private static int count;
+    private final int id;
     private final Mesh mesh;
     private final Vector3f position;
     private float scale;
     private final Vector3f rotation;
 
     public GameItem(Mesh mesh) {
+        this.id = count;
+        count += 1;
         this.mesh = mesh;
         position = new Vector3f();
         scale = 1;
         rotation = new Vector3f();
+    }
+
+    public int getId() {
+        return id;
     }
 
     public Vector3f getPosition() {
