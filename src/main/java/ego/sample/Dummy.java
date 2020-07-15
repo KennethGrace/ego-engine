@@ -21,29 +21,29 @@ public class Dummy implements GameLogic {
     public Dummy() {
         renderer = new Renderer();
         camera = new Camera();
-        cameraInc = new Vector3f(0f, 0f, 0f);
+        cameraInc = new Vector3f(0f, 1f, 0f);
     }
 
     @Override
     public void init(Window window) throws Exception {
         renderer.init(window);
         float reflectance = 1f;
-        Mesh mesh = OBJLoader.loadMesh("/models/Nefertiti.obj");
-        Material material = new Material(new Vector4f(0.5f, 0.5f, 0.5f, 1.0f), reflectance);
+        Mesh mesh = OBJLoader.loadMesh("/models/bob.obj");
+        //Material material = new Material(new Vector4f(0.5f, 0.5f, 0.5f, 1.0f), reflectance);
 
         //Mesh mesh = OBJLoader.loadMesh("/models/cube.obj");
-        //Texture texture = new Texture("textures/Nefertiti.png");
-        //Material material = new Material(texture, reflectance);
+        Texture texture = new Texture("textures/bob.png");
+        Material material = new Material(texture, reflectance);
 
         mesh.setMaterial(material);
         GameItem gameItem = new GameItem(mesh);
-        gameItem.setScale(0.05f);
+        gameItem.setScale(0.5f);
         gameItem.setPosition(0, 0, -2);
         gameItems = new GameItem[]{gameItem};
 
         ambientLight = new Vector3f(0.3f, 0.3f, 0.3f);
         Vector3f lightColour = new Vector3f(1, 1, 1);
-        Vector3f lightPosition = new Vector3f(0, 0, 1);
+        Vector3f lightPosition = new Vector3f(0, 1, 1);
         float lightIntensity = 1.0f;
         pointLight = new PointLight(lightColour, lightPosition, lightIntensity);
         PointLight.Attenuation att = new PointLight.Attenuation(0.0f, 0.0f, 1.0f);
